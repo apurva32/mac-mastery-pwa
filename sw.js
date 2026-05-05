@@ -1,4 +1,4 @@
-const CACHE = 'mac-mastery-v1';
+const CACHE = 'mac-mastery-v1.2';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
