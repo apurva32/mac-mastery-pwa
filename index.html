@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#080B10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mac Mastery">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>Mac Mastery</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080B10; --s1:#0F1520; --s2:#161E2D; --b:#1E2D42; --b2:#2A3F5A;
+  --tx:#E8E3DA; --muted:#657B94; --accent:#F4A228; --adim:rgba(244,162,40,.13);
+  --aborder:rgba(244,162,40,.5); --red:#FF6B6B; --green:#4ADFA0; --blue:#5BC4F5;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--tx);font-family:'DM Mono',monospace;font-size:13px;
+  line-height:1.6;min-height:100vh;overflow-x:hidden;padding-bottom:calc(64px + var(--safe-bottom));}
+
+/* ── NAV TABS ── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(8,11,16,0.95);
+  backdrop-filter:blur(12px);border-top:1px solid var(--b);
+  display:flex;z-index:200;padding-bottom:var(--safe-bottom);}
+.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:10px 4px 8px;cursor:pointer;transition:color .2s;color:var(--muted);gap:4px;
+  font-size:10px;letter-spacing:.06em;text-transform:uppercase;border:none;background:none;}
+.nav-tab.active{color:var(--accent);}
+.nav-tab svg{width:20px;height:20px;stroke-width:1.8;}
+
+/* ── PAGES ── */
+.page{display:none;animation:fadeIn .2s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── SHARED HEADER ── */
+.hdr{padding:1.25rem 1.25rem 1rem;border-bottom:1px solid var(--b);
+  background:var(--bg);position:sticky;top:0;z-index:100;}
+.logo{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:-.02em;}
+.logo em{color:var(--accent);font-style:normal;}
+.sub{color:var(--muted);font-size:10px;margin-top:2px;letter-spacing:.05em;}
+
+/* ── SEARCH ── */
+.srch{position:relative;margin:1rem 1.25rem 0;}
+.srch input{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:6px;
+  padding:8px 12px 8px 34px;color:var(--tx);font-family:'DM Mono',monospace;
+  font-size:12px;outline:none;transition:border-color .2s;}
+.srch input:focus{border-color:var(--aborder);}
+.srch::before{content:'⌕';position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  color:var(--muted);font-size:15px;pointer-events:none;}
+
+/* ── REFERENCE PAGE ── */
+.ref-content{padding:1rem 1.25rem;}
+.section-group{margin-bottom:1.5rem;}
+.section-title{font-family:'Syne',sans-serif;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:.75rem;
+  padding-bottom:.4rem;border-bottom:1px solid var(--adim);}
+.shortcut-row{display:flex;align-items:center;justify-content:space-between;
+  padding:.45rem .6rem;border-radius:6px;transition:background .15s;gap:8px;}
+.shortcut-row:hover{background:var(--s1);}
+.shortcut-row.hidden-search{display:none;}
+.action-label{color:var(--muted);font-size:11.5px;flex:1;min-width:0;}
+.win-key, .mac-key{display:inline-flex;align-items:center;gap:3px;flex-shrink:0;}
+.kbd{background:var(--s2);border:1px solid var(--b2);border-bottom:2px solid var(--b2);
+  border-radius:4px;padding:2px 6px;font-size:10.5px;color:var(--tx);
+  font-family:'DM Mono',monospace;white-space:nowrap;}
+.kbd.win{border-color:#3a5070;}
+.arrow{color:var(--muted);font-size:10px;margin:0 2px;}
+
+/* ── LEARN PAGE ── */
+.learn-wrap{padding:1rem 1.25rem;}
+.day-banner{background:var(--s1);border:1px solid var(--b);border-radius:10px;
+  padding:1rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;}
+.day-info .day-num{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--accent);}
+.day-info .day-topic{font-size:11px;color:var(--muted);margin-top:1px;}
+.xp-pill{background:var(--adim);border:1px solid var(--aborder);border-radius:20px;
+  padding:4px 12px;font-size:11px;color:var(--accent);}
+.progress-bar{height:4px;background:var(--b);border-radius:2px;margin-bottom:1.5rem;overflow:hidden;}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .5s ease;}
+.flashcard{background:var(--s1);border:1px solid var(--b);border-radius:12px;
+  padding:1.5rem;min-height:180px;cursor:pointer;transition:transform .15s,border-color .2s;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;position:relative;overflow:hidden;margin-bottom:1rem;}
+.flashcard:hover{transform:translateY(-2px);border-color:var(--aborder);}
+.flashcard::before{content:'tap to flip';position:absolute;bottom:10px;right:14px;
+  font-size:9px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;}
+.flashcard.flipped::before{content:'tap to flip back';}
+.card-face{transition:opacity .15s;}
+.card-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem;}
+.card-action{font-size:1rem;font-weight:500;color:var(--tx);margin-bottom:.5rem;}
+.card-win{display:inline-flex;align-items:center;gap:4px;margin-top:.5rem;}
+.card-mac{font-size:1.15rem;color:var(--accent);font-weight:500;}
+.card-nav{display:flex;gap:8px;justify-content:center;}
+.card-btn{background:var(--s2);border:1px solid var(--b);border-radius:8px;
+  padding:8px 20px;color:var(--tx);font-family:'DM Mono',monospace;font-size:11px;
+  cursor:pointer;transition:all .15s;letter-spacing:.05em;}
+.card-btn:hover{border-color:var(--aborder);color:var(--accent);}
+.card-btn.primary{background:var(--adim);border-color:var(--aborder);color:var(--accent);}
+.streak-row{display:flex;gap:8px;margin-bottom:1.25rem;}
+.stat-box{flex:1;background:var(--s1);border:1px solid var(--b);border-radius:8px;
+  padding:.6rem;text-align:center;}
+.stat-val{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent);}
+.stat-lbl{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:2px;}
+
+/* ── QUIZ PAGE ── */
+.quiz-wrap{padding:1rem 1.25rem;}
+.quiz-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
+.quiz-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;}
+.level-badge{background:var(--adim);border:1px solid var(--aborder);border-radius:20px;
+  padding:3px 12px;font-size:10px;color:var(--accent);letter-spacing:.06em;}
+.q-card{background:var(--s1);border:1px solid var(--b);border-radius:12px;padding:1.25rem;
+  margin-bottom:1rem;}
+.q-num{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}
+.q-text{font-size:.95rem;color:var(--tx);margin-bottom:1rem;line-height:1.5;}
+.q-options{display:flex;flex-direction:column;gap:8px;}
+.q-opt{background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:.65rem .9rem;
+  cursor:pointer;transition:all .15s;font-size:12px;font-family:'DM Mono',monospace;
+  text-align:left;color:var(--tx);}
+.q-opt:hover:not(:disabled){border-color:var(--aborder);background:var(--adim);}
+.q-opt.correct{border-color:var(--green);background:rgba(74,223,160,.1);color:var(--green);}
+.q-opt.wrong{border-color:var(--red);background:rgba(255,107,107,.1);color:var(--red);}
+.q-opt:disabled{cursor:default;}
+.q-feedback{padding:.6rem .9rem;border-radius:8px;font-size:11.5px;line-height:1.5;
+  margin-top:.5rem;display:none;}
+.q-feedback.show{display:block;}
+.q-feedback.good{background:rgba(74,223,160,.08);border:1px solid rgba(74,223,160,.3);color:var(--green);}
+.q-feedback.bad{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.3);color:var(--red);}
+.q-next{width:100%;background:var(--adim);border:1px solid var(--aborder);border-radius:8px;
+  padding:10px;color:var(--accent);font-family:'DM Mono',monospace;font-size:12px;
+  cursor:pointer;transition:all .15s;margin-top:.75rem;letter-spacing:.05em;display:none;}
+.q-next.show{display:block;}
+.q-next:hover{background:rgba(244,162,40,.2);}
+.xp-bar-wrap{margin-bottom:1rem;}
+.xp-bar-label{display:flex;justify-content:space-between;font-size:10px;
+  color:var(--muted);margin-bottom:4px;}
+.xp-bar{height:6px;background:var(--b);border-radius:3px;overflow:hidden;}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--accent),#ffcc66);
+  border-radius:3px;transition:width .6s ease;}
+.result-screen{text-align:center;padding:1.5rem 1rem;display:none;}
+.result-screen.show{display:block;}
+.result-grade{font-size:3rem;margin-bottom:.5rem;}
+.result-title{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:.25rem;}
+.result-sub{color:var(--muted);font-size:12px;margin-bottom:1.5rem;}
+.result-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.25rem;}
+.result-stat{background:var(--s1);border:1px solid var(--b);border-radius:8px;padding:.75rem;}
+.rs-val{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:var(--accent);}
+.rs-lbl{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:2px;}
+.restart-btn{background:var(--adim);border:1px solid var(--aborder);border-radius:8px;
+  padding:10px 24px;color:var(--accent);font-family:'DM Mono',monospace;font-size:12px;
+  cursor:pointer;transition:all .15s;letter-spacing:.05em;}
+.restart-btn:hover{background:rgba(244,162,40,.2);}
+.xp-toast{position:fixed;top:80px;right:16px;background:var(--adim);
+  border:1px solid var(--aborder);border-radius:8px;padding:6px 14px;
+  color:var(--accent);font-size:12px;z-index:300;opacity:0;
+  transition:opacity .3s;pointer-events:none;}
+.xp-toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<div id="toast" class="xp-toast"></div>
+
+<!-- ═══════════════════════════════ REFERENCE PAGE ═══════════════════════════════ -->
+<div id="page-ref" class="page active">
+  <div class="hdr">
+    <div class="logo">Mac <em>Mastery</em></div>
+    <div class="sub">Windows → Mac · Shortcut Reference</div>
+  </div>
+  <div class="srch"><input type="search" id="refSearch" placeholder="Search shortcuts…" autocomplete="off"></div>
+  <div class="ref-content" id="refContent"></div>
+</div>
+
+<!-- ═══════════════════════════════ LEARN PAGE ═══════════════════════════════ -->
+<div id="page-learn" class="page">
+  <div class="hdr">
+    <div class="logo">Daily <em>Learn</em></div>
+    <div class="sub" id="learnDate"></div>
+  </div>
+  <div class="learn-wrap">
+    <div class="streak-row">
+      <div class="stat-box"><div class="stat-val" id="statXP">0</div><div class="stat-lbl">Total XP</div></div>
+      <div class="stat-box"><div class="stat-val" id="statStreak">0</div><div class="stat-lbl">Day Streak</div></div>
+      <div class="stat-box"><div class="stat-val" id="statLevel">1</div><div class="stat-lbl">Level</div></div>
+    </div>
+    <div class="day-banner">
+      <div class="day-info">
+        <div class="day-num" id="dayNum">Day 1</div>
+        <div class="day-topic" id="dayTopic">Everyday Essentials</div>
+      </div>
+      <div class="xp-pill" id="dayXP">+50 XP</div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="cardProgress" style="width:0%"></div></div>
+    <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <div class="card-face" id="cardFace">
+        <div class="card-label">What's the Mac shortcut for…</div>
+        <div class="card-action" id="cardAction">—</div>
+        <div class="card-win" id="cardWin"></div>
+      </div>
+    </div>
+    <div class="card-nav">
+      <button class="card-btn" onclick="prevCard()">← Prev</button>
+      <button class="card-btn primary" onclick="nextCard()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ QUIZ PAGE ═══════════════════════════════ -->
+<div id="page-quiz" class="page">
+  <div class="hdr">
+    <div class="quiz-header">
+      <div class="quiz-title">Mac <em style="color:var(--accent);font-style:normal">Quiz</em></div>
+      <div class="level-badge" id="levelBadge">Rookie</div>
+    </div>
+    <div class="xp-bar-wrap">
+      <div class="xp-bar-label"><span id="xpLabel">0 XP</span><span id="xpNext">100 XP to next level</span></div>
+      <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="quiz-wrap">
+    <div id="quizActive">
+      <div class="q-card">
+        <div class="q-num" id="qNum">Question 1 / 10</div>
+        <div class="q-text" id="qText">Loading…</div>
+        <div class="q-options" id="qOptions"></div>
+        <div class="q-feedback" id="qFeedback"></div>
+        <button class="q-next" id="qNext" onclick="nextQuestion()">Next Question →</button>
+      </div>
+    </div>
+    <div class="result-screen" id="resultScreen">
+      <div class="result-grade" id="rGrade">🎯</div>
+      <div class="result-title" id="rTitle">Great Work!</div>
+      <div class="result-sub" id="rSub">Keep practising to master the Mac.</div>
+      <div class="result-stats">
+        <div class="result-stat"><div class="rs-val" id="rCorrect">0</div><div class="rs-lbl">Correct</div></div>
+        <div class="result-stat"><div class="rs-val" id="rXP">+0</div><div class="rs-lbl">XP Earned</div></div>
+        <div class="result-stat"><div class="rs-val" id="rAccuracy">0%</div><div class="rs-lbl">Accuracy</div></div>
+        <div class="result-stat"><div class="rs-val" id="rStreak">x0</div><div class="rs-lbl">Best Streak</div></div>
+      </div>
+      <button class="restart-btn" onclick="startQuiz()">Play Again →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ BOTTOM NAV ═══════════════════════════════ -->
+<nav class="bottom-nav">
+  <button class="nav-tab active" id="tab-ref" onclick="showPage('ref')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h16M4 10h16M4 14h10M4 18h7"/></svg>
+    Reference
+  </button>
+  <button class="nav-tab" id="tab-learn" onclick="showPage('learn')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    Learn
+  </button>
+  <button class="nav-tab" id="tab-quiz" onclick="showPage('quiz')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2.5"/></svg>
+    Quiz
+  </button>
+</nav>
+
+<script>
+// ════════════════════════════════════════════
+//  DATA
+// ════════════════════════════════════════════
+const SHORTCUTS = [
+  // Everyday
+  {cat:'Everyday Essentials',action:'Copy',win:'Ctrl+C',mac:'⌘ C'},
+  {cat:'Everyday Essentials',action:'Paste',win:'Ctrl+V',mac:'⌘ V'},
+  {cat:'Everyday Essentials',action:'Cut',win:'Ctrl+X',mac:'⌘ X'},
+  {cat:'Everyday Essentials',action:'Undo',win:'Ctrl+Z',mac:'⌘ Z'},
+  {cat:'Everyday Essentials',action:'Redo',win:'Ctrl+Y',mac:'⌘ Shift+Z'},
+  {cat:'Everyday Essentials',action:'Select All',win:'Ctrl+A',mac:'⌘ A'},
+  {cat:'Everyday Essentials',action:'Save',win:'Ctrl+S',mac:'⌘ S'},
+  {cat:'Everyday Essentials',action:'Find',win:'Ctrl+F',mac:'⌘ F'},
+  {cat:'Everyday Essentials',action:'Print',win:'Ctrl+P',mac:'⌘ P'},
+  {cat:'Everyday Essentials',action:'New Window',win:'Ctrl+N',mac:'⌘ N'},
+  {cat:'Everyday Essentials',action:'Open File',win:'Ctrl+O',mac:'⌘ O'},
+  {cat:'Everyday Essentials',action:'Close Window',win:'Alt+F4',mac:'⌘ W'},
+  // Apps & Switching
+  {cat:'Apps & Switching',action:'Switch App',win:'Alt+Tab',mac:'⌘ Tab'},
+  {cat:'Apps & Switching',action:'Quit App',win:'Alt+F4',mac:'⌘ Q'},
+  {cat:'Apps & Switching',action:'Force Quit',win:'Ctrl+Alt+Del',mac:'⌘ ⌥ Esc'},
+  {cat:'Apps & Switching',action:'Spotlight Search',win:'Win key',mac:'⌘ Space'},
+  {cat:'Apps & Switching',action:'Hide App',win:'Win+D',mac:'⌘ H'},
+  {cat:'Apps & Switching',action:'Minimize Window',win:'Win+↓',mac:'⌘ M'},
+  {cat:'Apps & Switching',action:'All Windows (Mission Control)',win:'Task View',mac:'^ ↑'},
+  {cat:'Apps & Switching',action:'Show Desktop',win:'Win+D',mac:'⌘ F3 or 4-finger spread'},
+  // Screenshots
+  {cat:'Screenshots',action:'Full Screen Screenshot',win:'PrtScn',mac:'⌘ Shift+3'},
+  {cat:'Screenshots',action:'Select Area Screenshot',win:'Win+Shift+S',mac:'⌘ Shift+4'},
+  {cat:'Screenshots',action:'Screenshot to Clipboard',win:'Ctrl+PrtScn',mac:'⌘ Shift+^ 3'},
+  {cat:'Screenshots',action:'Screenshot Toolbar',win:'Win+Shift+S',mac:'⌘ Shift+5'},
+  // Text & Editing
+  {cat:'Text & Editing',action:'Bold',win:'Ctrl+B',mac:'⌘ B'},
+  {cat:'Text & Editing',action:'Italic',win:'Ctrl+I',mac:'⌘ I'},
+  {cat:'Text & Editing',action:'Underline',win:'Ctrl+U',mac:'⌘ U'},
+  {cat:'Text & Editing',action:'Word Jump (left/right)',win:'Ctrl+←/→',mac:'⌥ ←/→'},
+  {cat:'Text & Editing',action:'Line Start / End',win:'Home / End',mac:'⌘ ← / ⌘ →'},
+  {cat:'Text & Editing',action:'Doc Top / Bottom',win:'Ctrl+Home/End',mac:'⌘ ↑ / ⌘ ↓'},
+  {cat:'Text & Editing',action:'Delete Word Before Cursor',win:'Ctrl+Backspace',mac:'⌥ Delete'},
+  {cat:'Text & Editing',action:'Paste & Match Style',win:'Ctrl+Shift+V',mac:'⌘ Shift+⌥ V'},
+  // Finder / Files
+  {cat:'Finder & Files',action:'Open Finder',win:'Win+E',mac:'⌘ Space → "Finder"'},
+  {cat:'Finder & Files',action:'New Folder',win:'Ctrl+Shift+N',mac:'⌘ Shift+N'},
+  {cat:'Finder & Files',action:'Rename File',win:'F2',mac:'Return (Enter)'},
+  {cat:'Finder & Files',action:'Move to Trash',win:'Delete',mac:'⌘ Delete'},
+  {cat:'Finder & Files',action:'Empty Trash',win:'Shift+Delete',mac:'⌘ Shift+Delete'},
+  {cat:'Finder & Files',action:'Get Info / Properties',win:'Alt+Enter',mac:'⌘ I'},
+  {cat:'Finder & Files',action:'Quick Look (preview)',win:'—',mac:'Space'},
+  {cat:'Finder & Files',action:'Move File (cut+paste)',win:'Ctrl+X → Ctrl+V',mac:'⌘ C → ⌘ ⌥ V'},
+  {cat:'Finder & Files',action:'Go to Folder Path',win:'Address bar click',mac:'⌘ Shift+G'},
+  // Browser
+  {cat:'Browser',action:'New Tab',win:'Ctrl+T',mac:'⌘ T'},
+  {cat:'Browser',action:'Close Tab',win:'Ctrl+W',mac:'⌘ W'},
+  {cat:'Browser',action:'Reopen Closed Tab',win:'Ctrl+Shift+T',mac:'⌘ Shift+T'},
+  {cat:'Browser',action:'Address Bar',win:'Ctrl+L / F6',mac:'⌘ L'},
+  {cat:'Browser',action:'Refresh Page',win:'F5',mac:'⌘ R'},
+  {cat:'Browser',action:'Hard Refresh',win:'Ctrl+F5',mac:'⌘ Shift+R'},
+  {cat:'Browser',action:'Developer Tools',win:'F12',mac:'⌘ ⌥ I'},
+  {cat:'Browser',action:'Bookmark Page',win:'Ctrl+D',mac:'⌘ D'},
+  // System
+  {cat:'System',action:'Lock Screen',win:'Win+L',mac:'⌘ Ctrl+Q'},
+  {cat:'System',action:'System Settings',win:'Win+I',mac:'⌘ Space → "System Settings"'},
+  {cat:'System',action:'Emoji Picker',win:'Win+.',mac:'⌘ Ctrl+Space'},
+  {cat:'System',action:'Accessibility Zoom In',win:'Win++',mac:'⌘ ⌥ ='},
+  {cat:'System',action:'Volume Up/Down',win:'Media keys',mac:'F12 / F11'},
+  {cat:'System',action:'Brightness Up/Down',win:'Media keys',mac:'F2 / F1'},
+];
+
+const DAYS = [
+  {topic:'Everyday Essentials',cats:['Everyday Essentials']},
+  {topic:'Apps & Switching',cats:['Apps & Switching']},
+  {topic:'Screenshots & Clipboard',cats:['Screenshots']},
+  {topic:'Text & Editing',cats:['Text & Editing']},
+  {topic:'Finder & Files',cats:['Finder & Files']},
+  {topic:'Browser Power User',cats:['Browser']},
+  {topic:'System & Shortcuts',cats:['System']},
+  {topic:'Mixed Review I',cats:['Everyday Essentials','Apps & Switching']},
+  {topic:'Mixed Review II',cats:['Text & Editing','Finder & Files']},
+  {topic:'Mixed Review III',cats:['Browser','System']},
+  {topic:'Full Review',cats:['Everyday Essentials','Apps & Switching','Screenshots','Text & Editing','Finder & Files','Browser','System']},
+];
+
+// ════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════
+function loadState(){
+  try { return JSON.parse(localStorage.getItem('mmState')) || defState(); }
+  catch(e){ return defState(); }
+}
+function defState(){
+  return {xp:0, streak:0, lastDate:'', cardIndex:0, cardFlipped:false,
+          quizIndex:0, quizCorrect:0, quizDone:false, quizAnswered:false,
+          quizBest:0, quizCurStreak:0, dayIndex:0};
+}
+function save(){ localStorage.setItem('mmState',JSON.stringify(S)); }
+let S = loadState();
+
+// Today's day slot (cycles through 11 days)
+const TODAY = new Date().toISOString().split('T')[0];
+if(S.lastDate !== TODAY){
+  if(S.lastDate){
+    const prev = new Date(S.lastDate), now = new Date(TODAY);
+    const diff = Math.round((now-prev)/(1000*60*60*24));
+    S.streak = diff === 1 ? S.streak+1 : (diff === 0 ? S.streak : 0);
+    if(diff > 0) S.dayIndex = (S.dayIndex + diff) % DAYS.length;
+  }
+  S.lastDate = TODAY;
+  S.cardIndex = 0; S.cardFlipped = false;
+  save();
+}
+
+// ════════════════════════════════════════════
+//  PAGE NAV
+// ════════════════════════════════════════════
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+  if(id==='learn') renderLearn();
+  if(id==='quiz') renderQuizHeader();
+}
+
+// ════════════════════════════════════════════
+//  REFERENCE
+// ════════════════════════════════════════════
+function buildRef(){
+  const cats = [...new Set(SHORTCUTS.map(s=>s.cat))];
+  const el = document.getElementById('refContent');
+  el.innerHTML = cats.map(cat=>`
+    <div class="section-group">
+      <div class="section-title">${cat}</div>
+      ${SHORTCUTS.filter(s=>s.cat===cat).map(s=>`
+        <div class="shortcut-row" data-action="${s.action.toLowerCase()}" data-win="${s.win.toLowerCase()}" data-mac="${s.mac.toLowerCase()}">
+          <span class="action-label">${s.action}</span>
+          <span class="win-key">${s.win.split('+').map(k=>`<span class="kbd win">${k}</span>`).join('<span class="arrow">+</span>')}</span>
+          <span class="arrow">→</span>
+          <span class="mac-key">${s.mac.split(' ').map(k=>`<span class="kbd">${k}</span>`).join('')}</span>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+document.getElementById('refSearch').addEventListener('input', function(){
+  const q = this.value.toLowerCase().trim();
+  document.querySelectorAll('.shortcut-row').forEach(row=>{
+    const match = !q || row.dataset.action.includes(q) || row.dataset.win.includes(q) || row.dataset.mac.includes(q);
+    row.classList.toggle('hidden-search', !match);
+  });
+  document.querySelectorAll('.section-group').forEach(g=>{
+    const anyVisible = [...g.querySelectorAll('.shortcut-row')].some(r=>!r.classList.contains('hidden-search'));
+    g.style.display = anyVisible ? '' : 'none';
+  });
+});
+
+// ════════════════════════════════════════════
+//  LEARN
+// ════════════════════════════════════════════
+function renderLearn(){
+  const day = DAYS[S.dayIndex % DAYS.length];
+  const cards = SHORTCUTS.filter(s=>day.cats.includes(s.cat));
+  document.getElementById('learnDate').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+  document.getElementById('dayNum').textContent = `Day ${(S.dayIndex%DAYS.length)+1}`;
+  document.getElementById('dayTopic').textContent = day.topic;
+  document.getElementById('dayXP').textContent = `+${cards.length*5} XP`;
+  document.getElementById('statXP').textContent = S.xp.toLocaleString();
+  document.getElementById('statStreak').textContent = S.streak;
+  document.getElementById('statLevel').textContent = getLevel(S.xp).num;
+
+  const idx = Math.min(S.cardIndex, cards.length-1);
+  const pct = cards.length > 1 ? (idx/(cards.length-1))*100 : 100;
+  document.getElementById('cardProgress').style.width = pct+'%';
+
+  const card = cards[idx];
+  S.cardFlipped = false;
+  renderCardFace(card, false);
+
+  // store for flip
+  window._cards = cards;
+  window._cardIdx = idx;
+}
+
+function renderCardFace(card, flipped){
+  const fc = document.getElementById('flashcard');
+  fc.classList.toggle('flipped', flipped);
+  document.getElementById('cardFace').innerHTML = flipped
+    ? `<div class="card-label">Mac shortcut</div>
+       <div class="card-mac">${card.mac}</div>
+       <div style="margin-top:.5rem;font-size:11px;color:var(--muted);">${card.action}</div>`
+    : `<div class="card-label">What's the Mac shortcut for…</div>
+       <div class="card-action">${card.action}</div>
+       <div class="card-win">${card.win.split('+').map(k=>`<span class="kbd win" style="margin:0 1px">${k}</span>`).join('<span style="margin:0 3px;color:var(--muted)">+</span>')}</div>`;
+}
+
+function flipCard(){
+  S.cardFlipped = !S.cardFlipped;
+  if(!S.cardFlipped){
+    // Award XP for completing a card
+    S.xp += 5; save();
+    showToast('+5 XP');
+    document.getElementById('statXP').textContent = S.xp.toLocaleString();
+  }
+  renderCardFace(window._cards[window._cardIdx], S.cardFlipped);
+}
+
+function nextCard(){
+  const cards = window._cards;
+  if(S.cardIndex < cards.length-1){ S.cardIndex++; } else { S.cardIndex=0; }
+  S.cardFlipped=false; save(); renderLearn();
+}
+function prevCard(){
+  if(S.cardIndex > 0){ S.cardIndex--; } else { S.cardIndex = window._cards.length-1; }
+  S.cardFlipped=false; save(); renderLearn();
+}
+
+// ════════════════════════════════════════════
+//  QUIZ
+// ════════════════════════════════════════════
+const LEVELS = [
+  {num:1,name:'Rookie',min:0,max:100},
+  {num:2,name:'Learner',min:100,max:300},
+  {num:3,name:'Regular',min:300,max:600},
+  {num:4,name:'Pro',min:600,max:1000},
+  {num:5,name:'Expert',min:1000,max:1500},
+  {num:6,name:'Master',min:1500,max:9999},
+];
+function getLevel(xp){ return LEVELS.find(l=>xp>=l.min&&xp<l.max) || LEVELS[LEVELS.length-1]; }
+
+let quizQuestions = [], qIdx=0, qCorrect=0, qAnswered=false, qBest=0, qStreak=0;
+
+function buildQuiz(){
+  // Pick 10 random questions
+  const pool = [...SHORTCUTS].sort(()=>Math.random()-.5).slice(0,10);
+  quizQuestions = pool.map(s=>{
+    // Generate 3 wrong answers
+    const wrong = SHORTCUTS.filter(x=>x!==s).sort(()=>Math.random()-.5).slice(0,3).map(x=>x.mac);
+    const opts = [...wrong, s.mac].sort(()=>Math.random()-.5);
+    return {q:`What's the Mac shortcut for "${s.action}"?`, correct:s.mac, options:opts, hint:`Windows: ${s.win}`};
+  });
+  return quizQuestions;
+}
+
+function startQuiz(){
+  buildQuiz();
+  qIdx=0; qCorrect=0; qAnswered=false; qBest=0; qStreak=0;
+  document.getElementById('resultScreen').classList.remove('show');
+  document.getElementById('quizActive').style.display='';
+  renderQuestion();
+  renderQuizHeader();
+}
+
+function renderQuestion(){
+  if(qIdx >= quizQuestions.length){ showResult(); return; }
+  const q = quizQuestions[qIdx];
+  qAnswered = false;
+  document.getElementById('qNum').textContent = `Question ${qIdx+1} / ${quizQuestions.length}`;
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('qFeedback').className='q-feedback';
+  document.getElementById('qFeedback').textContent='';
+  document.getElementById('qNext').className='q-next';
+  document.getElementById('qOptions').innerHTML = q.options.map(opt=>`
+    <button class="q-opt" onclick="answerQ('${opt.replace(/'/g,"\\'")}')">
+      ${opt}
+    </button>`).join('');
+}
+
+function answerQ(chosen){
+  if(qAnswered) return;
+  qAnswered = true;
+  const q = quizQuestions[qIdx];
+  const correct = chosen === q.correct;
+  document.querySelectorAll('.q-opt').forEach(btn=>{
+    btn.disabled=true;
+    if(btn.textContent.trim()===q.correct) btn.classList.add('correct');
+    if(btn.textContent.trim()===chosen && !correct) btn.classList.add('wrong');
+  });
+  const fb = document.getElementById('qFeedback');
+  fb.className = 'q-feedback show '+(correct?'good':'bad');
+  if(correct){
+    qCorrect++; qStreak++; qBest=Math.max(qBest,qStreak);
+    const xpGain = 20 + (qStreak>2?10:0);
+    S.xp += xpGain; save();
+    fb.textContent = `✓ Correct! +${xpGain} XP${qStreak>2?' 🔥 Streak bonus!':''}`;
+    showToast(`+${xpGain} XP`);
+    renderQuizHeader();
+  } else {
+    qStreak=0;
+    fb.textContent = `✗ Correct answer: ${q.correct}  ·  Hint: ${q.hint}`;
+  }
+  document.getElementById('qNext').className='q-next show';
+}
+
+function nextQuestion(){ qIdx++; renderQuestion(); }
+
+function showResult(){
+  document.getElementById('quizActive').style.display='none';
+  const rs=document.getElementById('resultScreen');
+  rs.classList.add('show');
+  const pct=Math.round(qCorrect/quizQuestions.length*100);
+  const grade = pct===100?'🏆':pct>=90?'⭐':pct>=70?'🎯':pct>=50?'📈':'💪';
+  const title = pct===100?'Perfect!':pct>=90?'Excellent!':pct>=70?'Great Work!':pct>=50?'Good Progress!':'Keep Going!';
+  const bonus = qCorrect*10;
+  S.xp += bonus; save();
+  document.getElementById('rGrade').textContent=grade;
+  document.getElementById('rTitle').textContent=title;
+  document.getElementById('rSub').textContent=`${pct}% accuracy · +${bonus} completion bonus`;
+  document.getElementById('rCorrect').textContent=`${qCorrect}/${quizQuestions.length}`;
+  document.getElementById('rXP').textContent=`+${qCorrect*20+bonus}`;
+  document.getElementById('rAccuracy').textContent=pct+'%';
+  document.getElementById('rStreak').textContent='x'+qBest;
+  renderQuizHeader();
+}
+
+function renderQuizHeader(){
+  const lv=getLevel(S.xp);
+  document.getElementById('levelBadge').textContent=lv.name;
+  document.getElementById('xpLabel').textContent=S.xp.toLocaleString()+' XP';
+  document.getElementById('xpNext').textContent=`${lv.max-S.xp} to next level`;
+  const pct=((S.xp-lv.min)/(lv.max-lv.min))*100;
+  document.getElementById('xpFill').style.width=Math.min(100,pct)+'%';
+}
+
+// ════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),1500);
+}
+
+// ════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════
+buildRef();
+renderLearn();
+renderQuizHeader();
+startQuiz();
+
+// Register service worker
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
