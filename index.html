@@ -165,7 +165,7 @@ body{background:var(--bg);color:var(--tx);font-family:'DM Mono',monospace;font-s
 <div id="toast" class="xp-toast"></div>
 
 <!-- ═══════════════════════════════ REFERENCE PAGE ═══════════════════════════════ -->
-<div id="page-ref" class="page active">
+<div id="page-ref" class="page">
   <div class="hdr">
     <div class="logo">Mac <em>Mastery</em></div>
     <div class="sub">Windows → Mac · Shortcut Reference</div>
@@ -175,7 +175,7 @@ body{background:var(--bg);color:var(--tx);font-family:'DM Mono',monospace;font-s
 </div>
 
 <!-- ═══════════════════════════════ LEARN PAGE ═══════════════════════════════ -->
-<div id="page-learn" class="page">
+<div id="page-learn" class="page active">
   <div class="hdr">
     <div class="logo">Daily <em>Learn</em></div>
     <div class="sub" id="learnDate"></div>
@@ -247,10 +247,6 @@ body{background:var(--bg);color:var(--tx);font-family:'DM Mono',monospace;font-s
 
 <!-- ═══════════════════════════════ BOTTOM NAV ═══════════════════════════════ -->
 <nav class="bottom-nav">
-  <button class="nav-tab active" id="tab-ref" onclick="showPage('ref')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h16M4 10h16M4 14h10M4 18h7"/></svg>
-    Reference
-  </button>
   <button class="nav-tab" id="tab-learn" onclick="showPage('learn')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
     Learn
@@ -258,6 +254,10 @@ body{background:var(--bg);color:var(--tx);font-family:'DM Mono',monospace;font-s
   <button class="nav-tab" id="tab-quiz" onclick="showPage('quiz')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2.5"/></svg>
     Quiz
+  </button>
+  <button class="nav-tab active" id="tab-ref" onclick="showPage('ref')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h16M4 10h16M4 14h10M4 18h7"/></svg>
+    Reference
   </button>
 </nav>
 
